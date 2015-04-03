@@ -1,3 +1,4 @@
+""" Generate slices aligned to natural coordinate from mha file(s) """
 import sys
 import vtk
 
@@ -49,7 +50,7 @@ def write_slice(s, fn):
     wt.Write()
 
 
-def write_3slices(fn_mha="t.mha", pnt=(159, 233, 90), wxyz=(30.0, 0.0, 0.0, 1.0), sz=16, fnbase_out="out"):
+def write_3slices(fn_mha="t.mha", pnt=(159, 233, 90), wxyz=(0.0, 0.0, 0.0, 1.0), sz=16, fnbase_out="out"):
     """ write the 3 perpendicular slices with half of the size sz at point pnt"""
     rd = vtk.vtkMetaImageReader()
     rd.SetFileName(fn_mha)
