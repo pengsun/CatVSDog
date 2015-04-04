@@ -16,6 +16,8 @@ reslice.SetInputConnection(reader.GetOutputPort())
 reslice.SetInterpolationModeToLinear()
 
 # Setp 1: Think in the coordinate of the plane (the Output): the size of the slice
+# This defines WHAT the slice is
+
 # Enforce a 2D plane
 reslice.SetOutputDimensionality(2)
 # In pysical coordinate: what's the resolution, i.e., Millie Meter per pixel ?
@@ -31,6 +33,8 @@ reslice.SetOutputOrigin(0.0, 0.0, 0.0)
 
 # Setp 2: Think in the coordinate of the volume: where the slice should be? This is done 
 # by specifiying the center and the normal direction of the plane w.r.t. to the volume coordinate
+# This defines WHERE the slice is
+
 # Reslice axes
 tf = vtk.vtkTransform()
 # The order of the translation and the rotation is important!
@@ -45,6 +49,7 @@ reslice.SetResliceAxes(tf.GetMatrix())
 # certain computer. Cannot figure out why...
 
 # Step 3: done
+
 reslice.Update()
 ```
 
