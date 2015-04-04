@@ -40,8 +40,9 @@ tf.RotateX(0)
 tf.RotateY(6.4) # in degree
 tf.RotateZ(10)
 reslice.SetResliceAxes(tf.GetMatrix())
-# tf.GetMatrix() returns the 4X4 transformation matrix. This line of code is equivalent to reslice.SetTransform(tf), 
-# which, however, occasionally causes run time problem on certain computer. Cannot figure out why...
+# tf.GetMatrix() returns the 4X4 transformation matrix. This line of code is equivalent to 
+# reslice.SetResliceTransform(tf), which, however, occasionally causes run time problem on
+# certain computer. Cannot figure out why...
 
 # Step 3: done
 reslice.Update()
