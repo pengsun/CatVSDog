@@ -1,5 +1,7 @@
 """ Generate rotated slices from mha file(s) """
 import vtk
+import os
+import sys
 
 
 def tf_rotateXYZ(tf, a):
@@ -36,40 +38,46 @@ def sz2ext(sz):
 def gen_slice(img, s_tf, s_ext=sz2ext(16)):
     """ generate a slice on a plane """
     # debug output
-    print "in gen_slice:"
+    # print "in gen_slice:"
 
+    # the slice
     rs = vtk.vtkImageReslice()
     rs.SetInputData(img)
+    rs.SetInterpolationModeToLinear()
 
     # debug output
-    print "before:"
-    xxx = rs.GetOutputOrigin()
-    print "OutputOrigin", xxx
-    ooo = rs.GetOutputExtent()
-    print "OutputExtent", ooo
-    zzz = rs.GetResliceAxesDirectionCosines()
-    print "ResliceAxesDirectionCosine", zzz
-    yyy = rs.GetResliceAxesOrigin()
-    print "ResliceAxesOrigin", yyy
+    # print "before:"
+    # xxx = rs.GetOutputOrigin()
+    # print "OutputOrigin", xxx
+    # ooo = rs.GetOutputExtent()
+    # print "OutputExtent", ooo
+    # zzz = rs.GetResliceAxesDirectionCosines()
+    # print "ResliceAxesDirectionCosine", zzz
+    # yyy = rs.GetResliceAxesOrigin()
+    # print "ResliceAxesOrigin", yyy
 
+    # what the slice: define the output plane
+    rs.SetOutputDimensionality(2)  # enforcing a plane
+    rs.SetOutputSpacing(img.GetDataSpacing())
+    rs.SetOutputExtent(s_ext)
+    rs.SetOutputOrigin((0.0, 0.0, 0.0))
+
+    # where the slice: the transformation
     s_axes = s_tf.GetMatrix()
     rs.SetResliceAxes(s_axes)
-    rs.SetOutputExtent(s_ext)
-    rs.SetOutputDimensionality(2)  # enforcing a plane
 
-    rs.SetInterpolationModeToLinear()
     rs.Update()
 
     # debug output
-    print "After:"
-    xxx = rs.GetOutputOrigin()
-    print "OutputOrigin", xxx
-    ooo = rs.GetOutputExtent()
-    print "OutputExtent", ooo
-    zzz = rs.GetResliceAxesDirectionCosines()
-    print "ResliceAxesDirectionCosine", zzz
-    yyy = rs.GetResliceAxesOrigin()
-    print "ResliceAxesOrigin", yyy
+    # print "After:"
+    # xxx = rs.GetOutputOrigin()
+    # print "OutputOrigin", xxx
+    # ooo = rs.GetOutputExtent()
+    # print "OutputExtent", ooo
+    # zzz = rs.GetResliceAxesDirectionCosines()
+    # print "ResliceAxesDirectionCosine", zzz
+    # yyy = rs.GetResliceAxesOrigin()
+    # print "ResliceAxesOrigin", yyy
 
     return rs
 
@@ -134,7 +142,7 @@ def write_3slices(fn_mha="t.mha",
     write_slice(xz, fnbase_out + "_3.mha")
 
 
-def write_3slices_files(fn_mha="t.mha", fn_info="i.txt"):
+def write_3slices_files(fn_mha="t.mha", fn_info="i.txt", dir_out=os.getcwd()):
     """ write the 3-slice group specified in fn_info
     each line: angle center size file_name_base
     specifically: a1 a2 a3 c1 c2 c3 sz fnbase
@@ -149,7 +157,7 @@ def write_3slices_files(fn_mha="t.mha", fn_info="i.txt"):
 
     # loop the lines in info file and generate the 3-slice accordingly
     with open(fn_info, 'r') as f:
-        for line in f:
+        for cnt, line in enumerate(f):
             # get the angle, center, size and base name
             elems = line.split()
             a = [int(x) for x in elems[0:3]]
@@ -158,24 +166,48 @@ def write_3slices_files(fn_mha="t.mha", fn_info="i.txt"):
             fnbase_out = elems[7]
             # do the job
             s1, s2, s3 = gen_3s(img, a, cen, sz)
+
             # write the 3 slices
-            write_slice(s1, fnbase_out + "_1.mha")
-            write_slice(s2, fnbase_out + "_2.mha")
-            write_slice(s3, fnbase_out + "_3.mha")
+            fn1 = fnbase_out + "_" + str(cnt+1) + "_1.mha"
+            write_slice(s1, os.path.join(dir_out, fn1))
+
+            fn2 = fnbase_out + "_" + str(cnt+1) + "_2.mha"
+            write_slice(s2, os.path.join(dir_out, fn2))
+
+            fn3 = fnbase_out + "_" + str(cnt+1) + "_3.mha"
+            write_slice(s3, os.path.join(dir_out, fn3))
 
 
 if __name__ == "__main__":
-#    write_3slices_files()
+    dir_mha = "D:\data\defactoSeg"
+    dir_info = "D:\data\defactoSeg_matlab\sample_info"
+    dir_out = "D:\data\defactoSeg_matlab\slices"
 
-    write_3slices()
+    if len(sys.argv) != (1+3):
+        print "incorrect arguments, using default:"
+    else:
+        dir_mha = sys.argv[1]
+        dir_info = sys.argv[2]
+        dir_out = sys.argv[3]
 
-# if len(sys.argv) != (1+10):
-#        print "error"
-#        print "write_3slices(t.mha, (0, 0, 0), (30, 1, 0, 0), 128, haha)"
-#        print "mha file name, origin, WXYZ (angle plus the axis), size for extent, output base name"
-#    else:
-#        write_3slices(sys.argv[1],
-#                      [int(x) for x in sys.argv[2:5]],
-#                      [float(x) for x in sys.argv[5:9]],
-#                      int(sys.argv[9]),
-#                      sys.argv[10])
+    print "dir_mha", dir_mha
+    print "dir_info", dir_info
+    print "dir_out", dir_out
+
+    for f in os.listdir(dir_mha):
+        if os.path.isfile(f):
+            continue
+        if f == "." or f == "..":
+            continue
+
+        # mha file
+        fn_mha = os.path.join(dir_mha, f, "t.mha")
+        # info file
+        fn_info = os.path.join(dir_info, f + ".txt")
+        write_3slices_files(fn_mha, fn_info, dir_out)
+
+        print "done", fn_mha, "and", fn_info
+
+#    write_3slices_files("t.mha", "11-044-RVW.txt", os.path.join(os.getcwd(), "tmp"))
+
+#    write_3slices()

@@ -14,8 +14,9 @@ parfor i = 1 : numel(fns)
     fprintf('%s does not exist, skip\n', fn_mask);
     continue;
   end
+  
   % the output mask
-  fn_mask_out = fullfile(dir_data, fns(i).name, 'maskv2.mha');
+  fn_mask_out = fullfile(dir_data, fns(i).name, 'maskv3.mha');
 %   if ( exist(fn_mask_out,'file') )
 %     fprintf('%s exists, skip\n', fn_mask);
 %     continue;
