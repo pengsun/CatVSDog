@@ -145,7 +145,7 @@ def write_3slices(fn_mha="t.mha",
 def write_3slices_files(fn_mha="t.mha", fn_info="i.txt", dir_out=os.getcwd()):
     """ write the 3-slice group specified in fn_info
     each line: angle center size file_name_base
-    specifically: a1 a2 a3 c1 c2 c3 sz fnbase
+    specifically: a1 a2 a3     c1 c2 c3     sz label fnbase
     the 3*N output files would be: fnbase_1_1.mha, ..., fnbase_1_3.mha, fnbase_2_1.mha,..., fnbase_N_3.mha,
     where N is the number of lines in fn_info"""
 
@@ -155,6 +155,10 @@ def write_3slices_files(fn_mha="t.mha", fn_info="i.txt", dir_out=os.getcwd()):
     rd.Update()
     img = rd.GetOutput()
 
+    # make sure th output dir exists
+    if not os.path.exists(dir_out):
+        os.makedirs(dir_out)
+
     # loop the lines in info file and generate the 3-slice accordingly
     with open(fn_info, 'r') as f:
         for cnt, line in enumerate(f):
@@ -163,25 +167,22 @@ def write_3slices_files(fn_mha="t.mha", fn_info="i.txt", dir_out=os.getcwd()):
             a = [int(x) for x in elems[0:3]]
             cen = [int(x) for x in elems[3:6]]
             sz = int(elems[6])
-            fnbase_out = elems[7]
-            # do the job
-            s1, s2, s3 = gen_3s(img, a, cen, sz)
+            # elems[7] is the label, not used here
+            fnbase_out = elems[8]
+
+            # do the job: get the 3 slices
+            ss = gen_3s(img, a, cen, sz)
 
             # write the 3 slices
-            fn1 = fnbase_out + "_" + str(cnt+1) + "_1.mha"
-            write_slice(s1, os.path.join(dir_out, fn1))
-
-            fn2 = fnbase_out + "_" + str(cnt+1) + "_2.mha"
-            write_slice(s2, os.path.join(dir_out, fn2))
-
-            fn3 = fnbase_out + "_" + str(cnt+1) + "_3.mha"
-            write_slice(s3, os.path.join(dir_out, fn3))
+            for i, the_slice in enumerate(ss):
+                fn_slice = "%s_%d_%d.mha" % (fnbase_out, cnt+1, i+1)
+                write_slice(the_slice, os.path.join(dir_out, fn_slice))
 
 
 def write_3slices_dir(dir_mha, dir_info, dir_out):
     for f in os.listdir(dir_mha):
         # f should be a directory name
-        if os.path.isfile(f):
+        if os.path.isfile(os.path.join(dir_mha, f)):
             continue
         if f == "." or f == "..":
             continue
@@ -190,15 +191,27 @@ def write_3slices_dir(dir_mha, dir_info, dir_out):
         fn_mha = os.path.join(dir_mha, f, "t.mha")
         # info file
         fn_info = os.path.join(dir_info, f + ".txt")
-        write_3slices_files(fn_mha, fn_info, dir_out)
+        # skip if the info file does not exist
+        if not os.path.exists(fn_info):
+            print "%s not exists, skip" % (fn_info,)
+            continue
 
-        print "done", fn_mha, "and", fn_info
+       # skip if the output files not exist
+        if any(x.startswith(f) for x in os.listdir(dir_out)):
+            print "slices for %s exist, skip" % (f,)
+            continue
+
+        # do the job
+        write_3slices_files(fn_mha, fn_info, dir_out)
+        print "done", fn_mha, "and", fn_info,
+        print "wrote to", dir_out
 
 
 if __name__ == "__main__":
     dir_mha = "D:\data\defactoSeg"
     dir_info = "D:\data\defactoSeg_matlab\sample_info"
-    dir_out = "D:\data\defactoSeg_matlab\slices"
+    # dir_out = "D:\data\defactoSeg_matlab\slices"
+    dir_out = "C:\Temp\slices"
 
     if len(sys.argv) != (1+3):
         print "incorrect arguments, using default:"

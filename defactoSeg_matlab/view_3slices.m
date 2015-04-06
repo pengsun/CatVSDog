@@ -1,7 +1,7 @@
 %%
-dir_data = 'D:\data\defactoSeg_matlab\slices';
-name = '01-001-MAP';
-i = 234;
+dir_data = 'C:\Temp\slices';
+name = '10-035-JKI';
+i = 1000;
 %%
 fn1 = sprintf('%s_%d_%d.mha', name,i,1);
 a1 = mha_read_volume( fullfile(dir_data,fn1) );
@@ -23,6 +23,5 @@ subplot(1,3,1)
 imshow(a1, []);
 subplot(1,3,2)
 imshow(a2, []);
-imcontrast;
 subplot(1,3,3)
 imshow(a3, []);

@@ -1,4 +1,4 @@
-function write_sample_infoV2(fn_mask, a_ran, sz, fnbase, K,  fn_out)
+function write_sample_infoV2(fn_mask, a_ran, sz, fnbase, K, label,  fn_out)
 % write sampling info for the slices to txt file
 % fn_mask: string. file name of the mask, 1's (>0, to be exact) indicate where to sample
 % a_ran: [1] range for random rotated angles
@@ -16,14 +16,14 @@ ac = floor(ac) - 1;
 sz = round(sz);
 
 % write file
-line_tmpl = '%d %d %d    %d %d %d    %d    %s\n';
+line_tmpl = '%d %d %d    %d %d %d    %d   %d   %s\n';
 fid = fopen(fn_out, 'a'); % append if any
 if ( fid < 0), error('error while writing %s\n', fn_out); end
 for i = 1 : size(ac, 1)
   fprintf(fid, line_tmpl,...
     ac(i,1),ac(i,2),ac(i,3),...
     ac(i,4),ac(i,5),ac(i,6),...
-    sz,  fnbase);
+    sz,     label,  fnbase);
 end
 fclose(fid);
 
