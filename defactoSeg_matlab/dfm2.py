@@ -58,7 +58,7 @@ def gen_slice(img, s_tf, s_ext=sz2ext(16)):
 
     # what the slice: define the output plane
     rs.SetOutputDimensionality(2)  # enforcing a plane
-    rs.SetOutputSpacing(img.GetDataSpacing())
+    rs.SetOutputSpacing(img.GetSpacing())
     rs.SetOutputExtent(s_ext)
     rs.SetOutputOrigin((0.0, 0.0, 0.0))
 
@@ -178,6 +178,23 @@ def write_3slices_files(fn_mha="t.mha", fn_info="i.txt", dir_out=os.getcwd()):
             write_slice(s3, os.path.join(dir_out, fn3))
 
 
+def write_3slices_dir(dir_mha, dir_info, dir_out):
+    for f in os.listdir(dir_mha):
+        # f should be a directory name
+        if os.path.isfile(f):
+            continue
+        if f == "." or f == "..":
+            continue
+
+        # mha file
+        fn_mha = os.path.join(dir_mha, f, "t.mha")
+        # info file
+        fn_info = os.path.join(dir_info, f + ".txt")
+        write_3slices_files(fn_mha, fn_info, dir_out)
+
+        print "done", fn_mha, "and", fn_info
+
+
 if __name__ == "__main__":
     dir_mha = "D:\data\defactoSeg"
     dir_info = "D:\data\defactoSeg_matlab\sample_info"
@@ -194,20 +211,8 @@ if __name__ == "__main__":
     print "dir_info", dir_info
     print "dir_out", dir_out
 
-    for f in os.listdir(dir_mha):
-        if os.path.isfile(f):
-            continue
-        if f == "." or f == "..":
-            continue
+    write_3slices_dir(dir_mha, dir_info, dir_out)
 
-        # mha file
-        fn_mha = os.path.join(dir_mha, f, "t.mha")
-        # info file
-        fn_info = os.path.join(dir_info, f + ".txt")
-        write_3slices_files(fn_mha, fn_info, dir_out)
+    # write_3slices_files("t.mha", "01-001-MAP.txt", os.path.join(os.getcwd(), "tmp"))
 
-        print "done", fn_mha, "and", fn_info
-
-#    write_3slices_files("t.mha", "11-044-RVW.txt", os.path.join(os.getcwd(), "tmp"))
-
-#    write_3slices()
+    # write_3slices()
