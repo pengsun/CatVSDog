@@ -1,10 +1,13 @@
 %% load slices.mat
 % load('C:\Temp\slices.mat');
 load('.\tmp.mat');
+% load('.\tmp2.mat');
 %%
-i_inst = randi(numel(Y), 1);
+% i_inst = randi(size(X,4), 1);
+i_inst = 3178;
 %%
 I = X(:,:,:, i_inst);
+% y = find( Y(:,i_inst)==1 );
 y = Y(i_inst);
 %% show images
 figure;
