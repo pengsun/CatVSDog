@@ -51,7 +51,7 @@ ii = find( mask > 0 );
 if ( K < numel(ii) )
   ix = ii( randsample(numel(ii), K) );
 else
-  warning('In write_sample_infoV2: K >= numel(ii), all will be used\n');
+  %warning('In write_sample_infoV2: K >= numel(ii), all will be used\n');
   ix = ii;
 end
 [i1,i2,i3] = ind2sub(size(mask), ix);
