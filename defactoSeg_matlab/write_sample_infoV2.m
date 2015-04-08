@@ -4,15 +4,14 @@ function write_sample_infoV2(fn_mask, a_ran, sz, fnbase, K, label,  fn_out)
 % a_ran: [1] range for random rotated angles
 % sz: [1] size for the extent of the 2D slice
 % fnbase: string. base file name
-% K: [1]. # to be sampled
+% K: [1]. # to be sampled. all non-zeros will be used if K = inf
 % fn_out: string. output file name, a txt file with each line the information
 
 % read mask
 mk = mha_read_volume(fn_mask);
 % random angles and centers
 ac = gen_angle_center(mk, a_ran, K);
-% zero based integers!
-ac = floor(ac) - 1;
+% integer extent size
 sz = round(sz);
 
 % write file
@@ -31,11 +30,15 @@ fclose(fid);
 function ac = gen_angle_center(mask, a_ran, K)
 % random angles and centers
 %
+
 % centers
 c = sample_at(mask, K);
+% zero based integers!
+c = floor(c) - 1;
 
 % angles: [-a_ran, a_ran]
 a = a_ran * (2*rand(size(c))-1);
+a = round(a);
 
 % angles + centers
 ac = [a, c];
@@ -48,10 +51,8 @@ ii = find( mask > 0 );
 if ( K < numel(ii) )
   ix = ii( randsample(numel(ii), K) );
 else
-  warning('In write_sample_infoV2: K >= numel(ii), replacement = false\n');
-  ix = ii( randsample(numel(ii), K, true) );
+  warning('In write_sample_infoV2: K >= numel(ii), all will be used\n');
+  ix = ii;
 end
 [i1,i2,i3] = ind2sub(size(mask), ix);
 cen = [i1(:),i2(:),i3(:)];
-
-
