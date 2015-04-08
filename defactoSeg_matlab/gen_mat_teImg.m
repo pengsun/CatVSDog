@@ -1,26 +1,24 @@
-function gen_mat()
+function gen_mat_teImg()
 
 % config
-dir_info = 'D:\data\defactoSeg_matlab\sample_info';
+dir_info_te = 'D:\data\defactoSeg_matlab\sample_info';
 dir_slices = 'C:\Temp\slices';
-fn_out = 'C:\Temp\slices.mat';
+dir_out = 'C:\Temp\';
 
-% output data
-X = [];        % [H,W,3, N] data
-Y = [];        % [N] labels
-imgId = [];    % [N]
-subId = [];    % [N]
-img_info = {}; % {M}
-% .name: patient name
-% .ang: [3, N_i] angles about X, Y, Z
-% .cen: [3, N_i] sampling centers/points, X,Y,Z coordinates
-
-
-%
+% enumerate the info file
 img_cnt = 0;
-fns = dir( dir_info );
+fns = dir( dir_info_te );
 for i = 1 : numel(fns)
   if ( fns(i).isdir ), continue; end
+
+  % init the output data
+  X = [];        % [H,W,3, N] data
+  Y = [];        % [N] labels
+  subId = [];    % [N]
+  img_info = struct(...
+    'name', [],...
+    'ang', [],...
+    'cen', []);
 
   % for this image
   img_cnt = img_cnt + 1;
@@ -40,30 +38,21 @@ for i = 1 : numel(fns)
   assert( size(cen,2)==numel(yy) );
   
   % fill the output data for instances
-  if ( isempty(X) )
-    X = xx;
-    Y = yy(:);
-    imgId = img_cnt * ones( size(yy) );
-    subId = (1 : numel(yy))';
-  else
-    X = cat(4, X, xx);
-    Y = cat(1, Y, yy);
-    imgId = cat(1, imgId, img_cnt * ones( size(yy) ) );
-    subId = cat(1, subId, (1 : numel(yy))' );
-  end
-  % fill the output data for the image
-  img_info{img_cnt}.name = fns(i).name;
-  img_info{img_cnt}.ang = a;
-  img_info{img_cnt}.cen = cen;
+  X = xx;
+  Y = yy(:);
+  subId = (1 : numel(yy))';
   
-  %
-  fprintf('done %s\n', img_name);
+  % fill the output data for the image
+  img_info.name = fns(i).name;
+  img_info.ang = a;
+  img_info.cen = cen;
+  
+  % save
+  fn_out = fullfile(dir_out, [num2str(img_cnt),'.mat'] );
+  fprintf('saving %s...', fn_out);
+  save(fn_out, 'X','Y','subId','img_info', '-v7.3');
+  fprintf('done\n');
 end
-
-% save
-fprintf('saving %s...', fn_out);
-save(fn_out, 'X','Y','imgId','subId','img_info', '-v7.3');
-fprintf('done\n');
 
 function [xx, yy, a, cen] = get_data_from_img(dir_slices, img_name, C)
 % C: a1 a2 a3  c1 c2 c3  sz  label  fnbase
