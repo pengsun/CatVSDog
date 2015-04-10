@@ -4,6 +4,9 @@ load(dir_mat, 'setId','imgId','img_info');
 tid = imgId(setId==3);
 tid = unique(tid);
 clear setId imgId
+
+%%% Just a couple of images
+tid = tid(1:2);
 %% config
 dir_data = 'D:\data\defactoSeg\';
 dir_info_out = 'D:\data\defactoSeg_matlab\sample_info_teImg';

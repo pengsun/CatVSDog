@@ -208,10 +208,13 @@ def write_3slices_dir(dir_mha, dir_info, dir_out):
 
 
 if __name__ == "__main__":
+    # dir_mha = "D:\data\defactoSeg"
+    # dir_info = "D:\data\defactoSeg_matlab\sample_info"
+    # dir_out = "C:\Temp\slices"
+
     dir_mha = "D:\data\defactoSeg"
-    dir_info = "D:\data\defactoSeg_matlab\sample_info"
-    # dir_out = "D:\data\defactoSeg_matlab\slices"
-    dir_out = "C:\Temp\slices"
+    dir_info = "D:\data\defactoSeg_matlab\sample_info_teImg"
+    dir_out = "C:\Temp\slices_teImg"
 
     if len(sys.argv) != (1+3):
         print "incorrect arguments, using default:"

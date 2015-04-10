@@ -1,15 +1,15 @@
 %%
 dir_data  = 'D:\data\defactoSeg\';
-dir_info  = 'D:\data\defactoSeg_matlab\sample_info';
+dir_info  = 'D:\data\defactoSeg_matlab\sample_info_teImg';
 K = 500;
 %%
 fns = dir( dir_info );
-parfor i = 1 : numel(fns)
+for i = 1 : numel(fns)
   if ( fns(i).isdir ), continue; end
 
   % the input mask
   [~,name,ext] = fileparts(fns(i).name); 
-  fn_mask = fullfile(dir_data, name, 'maskv2.mha');
+  fn_mask = fullfile(dir_data, name, 'maskv3.mha');
   if ( ~exist(fn_mask,'file') )
     fprintf('%s does not exist, skip\n', fn_mask);
     continue;
@@ -18,10 +18,10 @@ parfor i = 1 : numel(fns)
   % the output sample info
   fn_info = fullfile(dir_info, fns(i).name);
   fid = fopen(fn_info);
-  tmp = textscan(fid, '%d %d %d  %d %d %d  %d  %s');
+  tmp = textscan(fid, '%d %d %d  %d %d %d  %d %d %s');
   fclose(fid);
   cen = [tmp{4}, tmp{5}, tmp{6}];
-  lables = tmp{8};
+  labels = tmp{8};
   
   % verify
   mask = mha_read_volume(fn_mask);
