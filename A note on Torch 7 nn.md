@@ -39,9 +39,9 @@ a = reshape(a, [4,3,2])
 **Torch**: last dim major. Try this and compare the output with that in Matlab:
 ``` Lua
 -- make a 4 x 3 x 2 array
-i = 0
 a = torch.Tensor(4,3,2)
 a:apply(function(x)
+  i = i or 0
   i = i + 1
   return i
   end)
