@@ -31,14 +31,14 @@ Predict for the unseen data using the trained model.
 ### dimensionality order
 **Matlab**: first dim major. Try this code:
 ``` Matlab
-% make a 4 x 3 x 2 array
+% make a 4 x 3 x 2 array by enumerating 1,2,...,24
 a = 1 : 4*3*2;
 a = reshape(a, [4,3,2])
 ```
 
 **Torch**: last dim major. Try this and compare the output with that in Matlab:
 ``` Lua
--- make a 4 x 3 x 2 array
+-- make a 4 x 3 x 2 array by enumerating 1,2,...,24
 a = torch.Tensor(4,3,2)
 a:apply(function(x)
   i = i or 0
