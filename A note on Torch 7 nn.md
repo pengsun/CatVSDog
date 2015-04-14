@@ -24,4 +24,5 @@ Predict for the unseen data using the trained model.
 
 ### memory layout
 **Matlab**: always contiguous, stride across dims is **not** allowed! This is for the consideration of high-performance linear algebra calculation, can cause difficulties for machine learning task. Matlab does use copy-on-write trick, this is, however, postponing the memory copy when slicing and modifying.
+
 **Torch**: might be not contiguous, stride acrosss dims is allowed! This is convenient for in-place operations that are common in machine learning (e.g., collect the parameters for the Neural Network model and update them all). Another benefit is the one-data-for-all (e.g., in supervised learning one can concatenate instances X and labels Y as a big Tensor and get them separately by slicing, which is in-place operation)
