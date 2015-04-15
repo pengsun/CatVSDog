@@ -35,15 +35,52 @@ Predict for the unseen data using the trained model.
 a = 1 : 4*3*2;
 a = reshape(a, [4,3,2])
 ```
+The output is:
+``` Matlab
+a(:,:,1) =
+
+     1     5     9
+     2     6    10
+     3     7    11
+     4     8    12
+
+
+a(:,:,2) =
+
+    13    17    21
+    14    18    22
+    15    19    23
+    16    20    24
+
+```
 
 **Torch**: last dim major. Try this and compare the output with that in Matlab:
 ``` Lua
 -- make a 4 x 3 x 2 array by enumerating 1,2,...,24
-a = torch.Tensor(4,3,2)
-a:apply(function(x)
-  i = i or 0
-  i = i + 1
-  return i
-  end)
-a
+a = torch.range(1,4*3*2)
+a:resize(4,3,2)
+```
+The output is
+```Lua
+(1,.,.) =
+   1   2
+   3   4
+   5   6
+
+(2,.,.) =
+   7   8
+   9  10
+  11  12
+
+(3,.,.) =
+  13  14
+  15  16
+  17  18
+
+(4,.,.) =
+  19  20
+  21  22
+  23  24
+[torch.DoubleTensor of dimension 4x3x2]
+
 ```
