@@ -33,7 +33,13 @@ See https://github.com/oxford-cs-ml-2015/practical4
 ## The `nngraph` library
 See https://github.com/torch/nngraph/
 
-BTW, the first example there intentionally shows off, a more friendly code is 
+BTW, the code for the first example 
+``` Lua
+x1 = nn.Linear(20,10)()
+mout = nn.Linear(10,1)(nn.Tanh()(nn.Linear(10,10)(nn.Tanh()(x1))))
+mlp = nn.gModule({x1},{mout})
+```
+is to intentionally show off. A more friendly code is like
 ``` Lua
 x1 = nn.Linear(20,10)()
 x2 = nn.Tanh()(x1)
