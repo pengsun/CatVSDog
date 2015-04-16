@@ -33,6 +33,26 @@ See https://github.com/oxford-cs-ml-2015/practical4
 ## The `nngraph` library
 See https://github.com/torch/nngraph/
 
+BTW, the first example there intentionally shows off, a more friendly code is 
+``` Lua
+x1 = nn.Linear(20,10)()
+x2 = nn.Tanh()(x1)
+x3 = nn.Linear(10,10)(x2)
+x4 = nn.Tanh()(x3)
+mout = nn.Linear(10,1)(x4)
+mlp = nn.gModule({x1},{mout})
+```
+Also, if the code
+``` Lua
+graph.dot(mlp.fg,'MLP')
+```
+throws an error saying qt stuff cannot be found, just run it with `qlua` (instead of `th`) or simply modify it to
+``` Lua
+graph.dot(mlp.fg,'MLP', 'filename')
+```
+which would write the graph to file `filename.svg`.
+
+
 ## Matlab Matrix (mxArray) v.s. Torch.Tensor
 
 ### memory layout
