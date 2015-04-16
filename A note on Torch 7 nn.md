@@ -21,6 +21,15 @@ Write your own numeric algorithm if you like. Also, the `optim` library includes
 ### test
 Predict for the unseen data using the trained model.
 
+
+## `nn` library
+Here layer is called *module* that holds `.a` at output and `.d` at input. The basic module, wrapper module, loss as module. Handy modules for DAG: `Concat`, `Parallel`, etc. Do the fprop() and bprop().
+
+See https://github.com/torch/nn/tree/master/doc
+
+
+## `nngraph` library
+
 ## Matlab Matrix (mxArray) v.s. Torch.Tensor
 
 ### memory layout
