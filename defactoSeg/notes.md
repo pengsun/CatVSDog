@@ -3,6 +3,7 @@
 * c.vtp: original Aorta + vessels mesh (vtkPolyData). Unit in CM
 
 * t.mha: the same with dataset.mha, but spacing = (1 1 1), origin = (0 0 0)
+* tu.mha: the same with t.mha, uncompressed for fast reading
 * t.vtk: the same with c.vtp, but re-calculate the coordinate
 * mask.mha: mask of t.vtk
 * maskv3.mha: mask of t.vtk where the Aorta has been removed (3rd version)

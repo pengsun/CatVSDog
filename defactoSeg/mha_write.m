@@ -51,7 +51,7 @@ function mha_write(filename, img, resolution, data_type)
 % write header
 fid = fopen(filename, 'w');
 if(fid<=0) 
-    printf('Impossible to open file %s\n', filename);
+    printf('Cannot open file %s\n', filename);
 end
 
 if(ndims(img) == 3)
