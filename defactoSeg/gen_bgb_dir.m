@@ -1,7 +1,6 @@
-%% generate back ground mask
+%% generate back ground mask, balanced sampling equal #pixels of fg
 %%
 dir_data = 'D:\data\defactoSeg\';
-sz = 8;
 %%
 fns = dir( dir_data );
 parfor i = 1 : numel(fns)
@@ -16,17 +15,17 @@ parfor i = 1 : numel(fns)
     continue;
   end
   
-  % the input vessel+Aorta mask
-  fn_mkav = fullfile(dir_data, fns(i).name, 'mask.mha');
-  if ( ~exist(fn_mkav,'file') )
-    fprintf('%s does not exist, skip\n', fn_mkav);
+  % the input background mask
+  fn_mkb = fullfile(dir_data, fns(i).name, 'maskb.mha');
+  if ( ~exist(fn_mkb,'file') )
+    fprintf('%s does not exist, skip\n', fn_mkb);
     continue;
   end
 
-  % the output back ground mask
-  fn_out = fullfile(dir_data, fns(i).name, 'maskb.mha');
+  % the output balanced back ground mask
+  fn_out = fullfile(dir_data, fns(i).name, 'maskbb.mha');
   
   % do the job
-  gen_bg(fn_mkv, fn_mkav,  fn_out);
+  gen_bgb(fn_mkv, fn_mkb,  fn_out);
   fprintf('done %s\n', fn_out);
 end

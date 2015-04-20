@@ -13,3 +13,5 @@ The work flow for generating testing images data:
 * `dfm2.py`: write the slices to file
 * `gen_mat_teImg.m`: generate the final *.mat file, one mat for one image
 * `process_data_teImg,.m`: processing testing data with the information of training data
+
+Generate balanced background mask
