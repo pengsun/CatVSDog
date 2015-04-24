@@ -10,7 +10,8 @@ function mhawrite(filename, img, resolution)
 %   directions. Default: [1.0, 1.0, 1.0]
 
 % Modified from WRITERAWFILE by Peng Sun 4/2/2015
-
+% The original file header:
+%
 % Copyright © 2009 University of Oxford
 % 
 % University of Oxford means the Chancellor, Masters and Scholars of
@@ -35,9 +36,6 @@ function mhawrite(filename, img, resolution)
 %
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-  %%% 
-  
 
   %%% write header
   fid = fopen(filename, 'w');
