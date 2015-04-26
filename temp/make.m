@@ -10,7 +10,7 @@ switch str(1:3)
     opt{end+1} = 'COMPFLAGS=/openmp $COMPFLAGS';
     opt{end+1} = 'LINKFLAGS=/openmp $LINKFLAGS';
   otherwise
-    opt{end+1} = 'CFLAGS=''%CFLAGS -pthread -std=c++11''';
+    opt{end+1} = 'CFLAGS=''$CFLAGS -pthread -std=c++11''';
     opt{end+1} = 'LDFLAGS=''$LDFLAGS -pthread -std=c++11''';
 end
 %% do it

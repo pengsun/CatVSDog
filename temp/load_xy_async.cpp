@@ -4,12 +4,15 @@
 
 using namespace std;
 
-
-void read_X_Y (const char *fn,  mxArray* &X, mxArray* &Y) {
+void read_X_Y (const char *fn,  mxArray** X, mxArray** Y) {
+  // TODO: need a lock here?
   MATFile *h = matOpen(fn, "r");
-  X = matGetVariable(h, "X"); // TODO: check 
-  Y = matGetVariable(h, "Y");
+  *X = matGetVariable(h, "X"); // TODO: check 
+  *Y = matGetVariable(h, "Y");
   matClose(h);
+
+  mexMakeArrayPersistent(*X);
+  mexMakeArrayPersistent(*Y);
 }
 
 struct mat_loader {
@@ -22,32 +25,43 @@ struct mat_loader {
   }
 
   void load (const char * fn) {
-    // wait until last loading finishes 
-    if (worker.joinable()) worker.join();
+    // clean the buffer
+    clear_buf();
 
     // begin a new thread to load the variables
-    thread t(read_X_Y,  fn, this->X, this->Y);
+    thread t(read_X_Y,  fn, &(this->X), &(this->Y));
 
     // return immediately
     this->worker = move(t);
   }
 
   void pop_buf (mxArray* &X, mxArray* &Y) {
-    // wait until last loading finishes...
     if (worker.joinable()) 
       worker.join();
-      
-    // pop them
-    X = this->X;
-    this->X = mxCreateDoubleMatrix(0,0,mxREAL);
 
+    // pop them: do nothing but return them to Matalb who takes the control
+    X = this->X;
     Y = this->Y;
-    this->Y = mxCreateDoubleMatrix(0,0,mxREAL);
+  }
+
+  void clear_buf () {
+    if (worker.joinable()) // wait until last loading finishes...
+      worker.join(); 
+
+    mxDestroyArray(X);
+    mxDestroyArray(Y);
   }
 
 };
 
 static mat_loader the_loader;
+
+void on_exit ()
+{
+  the_loader.clear_buf();
+  the_loader.worker.~thread();
+}
+
 
 // load_xy_async(fn_mat); loads the the mat file with name fn_mat in a separate thread and returns immediately
 // [X,Y] = load_xy_async(); loads the X, Y from buffer 
@@ -63,9 +77,10 @@ void mexFunction(int no, mxArray       *vo[],
 
     // begin loading and return 
     the_loader.load(buf);
+    mexAtExit( on_exit );
     return;
   }
-  
+
   // [X,Y] = load_xy_async():  loads the X, Y from buffer
   if (ni==0) {
     the_loader.pop_buf(vo[0], vo[1]);
