@@ -85,31 +85,6 @@ void clear_buf ()
   mexPrintf("Out clear_buf\n");
 }
 
-
-//void read_X_Y (const char *fn) {
-//  mexPrintf("In read_X_Y\n");
-//  // TODO: need a lock here?
-//  mutex mut;
-//  mut.lock();
-//
-//  mexPrintf("open mat\n");
-//  MATFile *h = matOpen(fn, "r");
-//
-//  mexPrintf("load X, Y from mat\n");
-//  X = matGetVariable(h, "X"); // TODO: check 
-//  Y = matGetVariable(h, "Y");
-//
-//  mexPrintf("close mat\n");
-//  matClose(h);
-//
-//  mexPrintf("make persistence buffer X, Y\n");
-//  mexMakeArrayPersistent(X);
-//  mexMakeArrayPersistent(Y);
-//
-//  mut.unlock();
-//  mexPrintf("Out read_X_Y\n");
-//}
-
 void read_X_Y (const char *fn) {
   mexPrintf("In read_X_Y\n"); 
   // TODO: need a lock here?
