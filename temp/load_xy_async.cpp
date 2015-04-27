@@ -22,7 +22,7 @@ struct mat_loader {
     }
 
     // begin a new thread to load the variables
-    thread t(read_X_Y,  fn, &(this->X), &(this->Y));
+    thread t(read_X_Y,  fn);
 
     // return immediately
     this->worker = move(t);
