@@ -128,10 +128,11 @@ void mexFunction(int no, mxArray       *vo[],
   // load_xy_async(fn_mat): load mat file and return immediately
   if (ni==1) {
     mexPrintf("In ni==1\n");
-
+    
     // get the file name 
     int buflen = mxGetN(vi[0])*sizeof(mxChar)+1;
-    char *filename  = (char*)mxMalloc(buflen);
+    //char *filename  = (char*)mxMalloc(buflen);
+    char filename[2048];
     mxGetString(vi[0], filename, buflen); // TODO: check status
 
     // begin loading and return 
