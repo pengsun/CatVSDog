@@ -38,7 +38,7 @@ struct mat_loader {
   }
 
   void clear_buf () {
-    mexPrintf("destroy buffer X, Y\n")
+    mexPrintf("destroy buffer X, Y\n");
     mxDestroyArray(X);
     mxDestroyArray(Y);
   }
@@ -56,7 +56,7 @@ void read_X_Y (const char *fn) {
   mexPrintf("open mat\n");
   MATFile *h = matOpen(fn, "r");
 
-  mexPrintf("read X, Y\n")
+  mexPrintf("read X, Y\n");
   the_loader.X = matGetVariable(h, "X"); // TODO: check 
   the_loader.Y = matGetVariable(h, "Y");
 
