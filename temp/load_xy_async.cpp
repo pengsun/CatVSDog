@@ -40,9 +40,9 @@ void pop_buf (mxArray* &xx, mxArray* &yy) {
 
 void clear_buf () 
 {
-  mexPrintf("In clear_buf\n");
-  mxDestroyArray(X);
-  mxDestroyArray(Y);
+  mexPrintf("In clear_buf: do noting\n");
+  //mxDestroyArray(X);
+  //mxDestroyArray(Y);
 }
 
 
