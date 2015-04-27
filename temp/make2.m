@@ -1,4 +1,4 @@
-mex -v -largeArrayDims CFLAGS='$CFLAGS -pthread -std=c++11' load_xy_async.cpp
+mex -v -largeArrayDims CXXFLAGS='\$CXXFLAGS -pthread -std=c++11' load_xy_async.cpp
 
 % %% config
 % opt = {};

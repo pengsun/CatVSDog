@@ -6,11 +6,18 @@ using namespace std;
 
 void read_X_Y (const char *fn,  mxArray** X, mxArray** Y) {
   // TODO: need a lock here?
+
+  mexPrintf("open mat\n");
   MATFile *h = matOpen(fn, "r");
+
+  mexPrintf("read X, Y\n")
   *X = matGetVariable(h, "X"); // TODO: check 
   *Y = matGetVariable(h, "Y");
+
+  mexPrintf("close mat\n");
   matClose(h);
 
+  mexPrintf("make persistence buffer X, Y\n")
   mexMakeArrayPersistent(*X);
   mexMakeArrayPersistent(*Y);
 }
@@ -45,9 +52,12 @@ struct mat_loader {
   }
 
   void clear_buf () {
-    if (worker.joinable()) // wait until last loading finishes...
+    if (worker.joinable()) { // wait until last loading finishes...
       worker.join(); 
+      mexPrintf("wait until last reading done\n");
+    }
 
+    mexPrintf("destroy buffer X, Y\n")
     mxDestroyArray(X);
     mxDestroyArray(Y);
   }
@@ -72,7 +82,7 @@ void mexFunction(int no, mxArray       *vo[],
   if (ni==1) {
     // get the file name 
     int buflen = mxGetN(vi[0])*sizeof(mxChar)+1;
-    char *buf  = mxMalloc(buflen);
+    char *buf  = (char*)mxMalloc(buflen);
     mxGetString(vi[0], buf, buflen); // TODO: check status
 
     // begin loading and return 
