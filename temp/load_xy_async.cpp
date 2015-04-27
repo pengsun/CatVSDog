@@ -20,6 +20,9 @@ void load_mat (const char * fn)
     mexPrintf("wait until last reading done\n");
   }
 
+  // clean the buffer
+  clear_buf();
+
   // begin a new thread to load the variables
   thread t(read_X_Y, fn);
 
@@ -50,8 +53,6 @@ void read_X_Y (const char *fn) {
   mexPrintf("In read_X_Y\n");
   // TODO: need a lock here?
 
-  // clean the buffer
-  clear_buf();
 
   mexPrintf("open mat\n");
   MATFile *h = matOpen(fn, "r");
