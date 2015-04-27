@@ -9,6 +9,7 @@ using namespace std;
 static thread  worker;
 static mxArray *X = 0;
 static mxArray *Y = 0;
+static char    filename[2048];
 
 void read_X_Y (const char *fn);
 void clear_buf();
@@ -85,28 +86,64 @@ void clear_buf ()
 }
 
 
+//void read_X_Y (const char *fn) {
+//  mexPrintf("In read_X_Y\n");
+//  // TODO: need a lock here?
+//  mutex mut;
+//  mut.lock();
+//
+//  mexPrintf("open mat\n");
+//  MATFile *h = matOpen(fn, "r");
+//
+//  mexPrintf("load X, Y from mat\n");
+//  X = matGetVariable(h, "X"); // TODO: check 
+//  Y = matGetVariable(h, "Y");
+//
+//  mexPrintf("close mat\n");
+//  matClose(h);
+//
+//  mexPrintf("make persistence buffer X, Y\n");
+//  mexMakeArrayPersistent(X);
+//  mexMakeArrayPersistent(Y);
+//
+//  mut.unlock();
+//  mexPrintf("Out read_X_Y\n");
+//}
+
 void read_X_Y (const char *fn) {
-  mexPrintf("In read_X_Y\n");
+  mexPrintf("In read_X_Y\n"); 
   // TODO: need a lock here?
   mutex mut;
   mut.lock();
 
-  mexPrintf("open mat\n");
+  // X
+  mexPrintf("open mat %s\n", fn); 
   MATFile *h = matOpen(fn, "r");
 
-  mexPrintf("load X, Y from mat\n");
+  mexPrintf("loading X from mat\n"); 
   X = matGetVariable(h, "X"); // TODO: check 
-  Y = matGetVariable(h, "Y");
-
-  mexPrintf("close mat\n");
+  
+  mexPrintf("close mat %s\n", fn); 
   matClose(h);
 
-  mexPrintf("make persistence buffer X, Y\n");
+  mexPrintf("make persistence buffer X\n"); 
   mexMakeArrayPersistent(X);
+
+  // Y
+  mexPrintf("open mat %s\n", fn); 
+  h = matOpen(fn, "r");
+
+  mexPrintf("loading Y from mat\n"); 
+  Y = matGetVariable(h, "Y");
+
+  mexPrintf("close mat %s\n", fn); 
+  matClose(h);
+
+  mexPrintf("make persistence buffer Y\n"); 
   mexMakeArrayPersistent(Y);
 
   mut.unlock();
-  mexPrintf("Out read_X_Y\n");
+  mexPrintf("Out read_X_Y\n"); 
 }
 
 void on_exit ()
@@ -134,11 +171,14 @@ void mexFunction(int no, mxArray       *vo[],
       mexPrintf("wait until last reading done\n");
     }
     
+    mutex mx;
+    mx.lock();
     // get the file name 
     int buflen = mxGetN(vi[0])*sizeof(mxChar)+1;
     //char *filename  = (char*)mxMalloc(buflen);
-    char filename[2048];
+    
     mxGetString(vi[0], filename, buflen); // TODO: check status
+    mx.unlock();
 
     // begin loading and return 
     load_mat(filename);
