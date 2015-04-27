@@ -29,10 +29,13 @@ void load_mat (const char * fn)
 
   // return immediately
   worker = move(t);
+
+  mexPrintf("Out load_mat\n");
 }
 
 void pop_buf (mxArray* &xx, mxArray* &yy) {
   mexPrintf("In pop_buf\n");
+
   if (worker.joinable()) 
     worker.join();
 
@@ -40,6 +43,8 @@ void pop_buf (mxArray* &xx, mxArray* &yy) {
   mexPrintf("deep copy\n");
   xx = mxDuplicateArray(X);
   yy = mxDuplicateArray(Y);
+
+  mexPrintf("Out pop_buf\n");
 }
 
 void clear_buf () 
@@ -47,13 +52,13 @@ void clear_buf ()
   mexPrintf("In clear_buf\n");
   mxDestroyArray(X);
   mxDestroyArray(Y);
+  mexPrintf("Out clear_buf\n");
 }
 
 
 void read_X_Y (const char *fn) {
   mexPrintf("In read_X_Y\n");
   // TODO: need a lock here?
-
 
   mexPrintf("open mat\n");
   MATFile *h = matOpen(fn, "r");
@@ -68,6 +73,8 @@ void read_X_Y (const char *fn) {
   mexPrintf("make persistence buffer X, Y\n");
   mexMakeArrayPersistent(X);
   mexMakeArrayPersistent(Y);
+
+  mexPrintf("Out read_X_Y\n");
 }
 
 void on_exit ()
@@ -76,6 +83,8 @@ void on_exit ()
 
   clear_buf();
   worker.~thread();
+
+  mexPrintf("Out on_exit");
 }
 
 
@@ -86,6 +95,8 @@ void mexFunction(int no, mxArray       *vo[],
 {
   // load_xy_async(fn_mat): load mat file and return immediately
   if (ni==1) {
+    mexPrintf("In ni==1");
+
     // get the file name 
     int buflen = mxGetN(vi[0])*sizeof(mxChar)+1;
     char *filename  = (char*)mxMalloc(buflen);
@@ -94,12 +105,18 @@ void mexFunction(int no, mxArray       *vo[],
     // begin loading and return 
     load_mat(filename);
     mexAtExit( on_exit );
+
+    mexPrintf("Out ni==1");
     return;
   }
 
   // [X,Y] = load_xy_async():  loads the X, Y from buffer
   if (ni==0) {
+    mexPrintf("In ni==0");
+
     pop_buf(vo[0], vo[1]);
+
+    mexPrintf("Out ni==0");
     return;
   }
 
