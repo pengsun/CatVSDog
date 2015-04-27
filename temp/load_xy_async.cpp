@@ -84,7 +84,7 @@ void on_exit ()
   clear_buf();
   worker.~thread();
 
-  mexPrintf("Out on_exit");
+  mexPrintf("Out on_exit\n");
 }
 
 
@@ -95,7 +95,7 @@ void mexFunction(int no, mxArray       *vo[],
 {
   // load_xy_async(fn_mat): load mat file and return immediately
   if (ni==1) {
-    mexPrintf("In ni==1");
+    mexPrintf("In ni==1\n");
 
     // get the file name 
     int buflen = mxGetN(vi[0])*sizeof(mxChar)+1;
@@ -106,17 +106,17 @@ void mexFunction(int no, mxArray       *vo[],
     load_mat(filename);
     mexAtExit( on_exit );
 
-    mexPrintf("Out ni==1");
+    mexPrintf("Out ni==1\n");
     return;
   }
 
   // [X,Y] = load_xy_async():  loads the X, Y from buffer
   if (ni==0) {
-    mexPrintf("In ni==0");
+    mexPrintf("In ni==0\n");
 
     pop_buf(vo[0], vo[1]);
 
-    mexPrintf("Out ni==0");
+    mexPrintf("Out ni==0\n");
     return;
   }
 
