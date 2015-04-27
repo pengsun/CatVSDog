@@ -9,6 +9,7 @@ static thread worker;
 static mxArray *X = 0;
 static mxArray *Y = 0;
 
+mxArray *mxCreateSharedDataCopy(mxArray *); // undocumented matlab
 
 void read_X_Y (const char *fn);
 
