@@ -4,23 +4,7 @@
 
 using namespace std;
 
-void read_X_Y (const char *fn,  mxArray** X, mxArray** Y) {
-  // TODO: need a lock here?
-
-  mexPrintf("open mat\n");
-  MATFile *h = matOpen(fn, "r");
-
-  mexPrintf("read X, Y\n")
-  *X = matGetVariable(h, "X"); // TODO: check 
-  *Y = matGetVariable(h, "Y");
-
-  mexPrintf("close mat\n");
-  matClose(h);
-
-  mexPrintf("make persistence buffer X, Y\n")
-  mexMakeArrayPersistent(*X);
-  mexMakeArrayPersistent(*Y);
-}
+void read_X_Y (const char *fn);
 
 struct mat_loader {
   thread worker;  
@@ -32,8 +16,10 @@ struct mat_loader {
   }
 
   void load (const char * fn) {
-    // clean the buffer
-    clear_buf();
+    if (worker.joinable()) { // wait until last loading finishes...
+      worker.join(); 
+      mexPrintf("wait until last reading done\n");
+    }
 
     // begin a new thread to load the variables
     thread t(read_X_Y,  fn, &(this->X), &(this->Y));
@@ -52,11 +38,6 @@ struct mat_loader {
   }
 
   void clear_buf () {
-    if (worker.joinable()) { // wait until last loading finishes...
-      worker.join(); 
-      mexPrintf("wait until last reading done\n");
-    }
-
     mexPrintf("destroy buffer X, Y\n")
     mxDestroyArray(X);
     mxDestroyArray(Y);
@@ -65,6 +46,27 @@ struct mat_loader {
 };
 
 static mat_loader the_loader;
+
+void read_X_Y (const char *fn) {
+  // TODO: need a lock here?
+
+  // clean the buffer
+  the_loader.clear_buf();
+
+  mexPrintf("open mat\n");
+  MATFile *h = matOpen(fn, "r");
+
+  mexPrintf("read X, Y\n")
+  the_loader.X = matGetVariable(h, "X"); // TODO: check 
+  the_loader.Y = matGetVariable(h, "Y");
+
+  mexPrintf("close mat\n");
+  matClose(h);
+
+  mexPrintf("make persistence buffer X, Y\n");
+  mexMakeArrayPersistent(the_loader.X);
+  mexMakeArrayPersistent(the_loader.Y);
+}
 
 void on_exit ()
 {
