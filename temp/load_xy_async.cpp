@@ -34,15 +34,16 @@ void pop_buf (mxArray* &xx, mxArray* &yy) {
     worker.join();
 
   // pop them: do nothing but return them to Matalb who takes the control
-  xx = X;
-  yy = Y;
+  mexPrintf("create shared data copy\n");
+  xx = mxCreateSharedDataCopy(X);
+  yy = mxCreateSharedDataCopy(Y);
 }
 
 void clear_buf () 
 {
-  mexPrintf("In clear_buf: do noting\n");
-  //mxDestroyArray(X);
-  //mxDestroyArray(Y);
+  mexPrintf("In clear_buf\n");
+  mxDestroyArray(X);
+  mxDestroyArray(Y);
 }
 
 
