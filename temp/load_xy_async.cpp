@@ -38,8 +38,10 @@ void load_mat (const char * fn)
 void pop_buf (mxArray* &xx, mxArray* &yy) {
   mexPrintf("In pop_buf\n");
 
-  if (worker.joinable()) 
+  if (worker.joinable()) {
+    mexPrintf("wait until buffer filled\n");
     worker.join();
+  }
 
   // pop them
   mexPrintf("deep copy\n");
@@ -66,7 +68,7 @@ void read_X_Y (const char *fn) {
   mexPrintf("open mat\n");
   MATFile *h = matOpen(fn, "r");
 
-  mexPrintf("read X, Y\n");
+  mexPrintf("load X, Y from mat\n");
   X = matGetVariable(h, "X"); // TODO: check 
   Y = matGetVariable(h, "Y");
 
@@ -74,8 +76,8 @@ void read_X_Y (const char *fn) {
   matClose(h);
 
   mexPrintf("make persistence buffer X, Y\n");
-  //mexMakeArrayPersistent(X);
-  //mexMakeArrayPersistent(Y);
+  mexMakeArrayPersistent(X);
+  mexMakeArrayPersistent(Y);
 
   mut.unlock();
   mexPrintf("Out read_X_Y\n");
