@@ -7,7 +7,6 @@ using namespace std;
 
 
 static thread  worker;
-static mutex   mut;
 static mxArray *X = 0;
 static mxArray *Y = 0;
 
@@ -78,6 +77,7 @@ void clear_buf ()
 void read_X_Y (const char *fn) {
   mexPrintf("In read_X_Y\n");
   // TODO: need a lock here?
+  mutex mut;
   mut.lock();
 
   mexPrintf("open mat\n");
