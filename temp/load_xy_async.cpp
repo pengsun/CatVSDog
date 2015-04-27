@@ -14,6 +14,8 @@ void read_X_Y (const char *fn);
 
 void load_mat (const char * fn) 
 {
+  mexPrintf("In load_mat\n");
+
   if (worker.joinable()) { // wait until last loading finishes...
     worker.join(); 
     mexPrintf("wait until last reading done\n");
@@ -27,6 +29,7 @@ void load_mat (const char * fn)
 }
 
 void pop_buf (mxArray* &xx, mxArray* &yy) {
+  mexPrintf("In pop_buf\n");
   if (worker.joinable()) 
     worker.join();
 
@@ -37,13 +40,14 @@ void pop_buf (mxArray* &xx, mxArray* &yy) {
 
 void clear_buf () 
 {
-  mexPrintf("destroy buffer X, Y\n");
+  mexPrintf("In clear_buf\n");
   mxDestroyArray(X);
   mxDestroyArray(Y);
 }
 
 
 void read_X_Y (const char *fn) {
+  mexPrintf("In read_X_Y\n");
   // TODO: need a lock here?
 
   // clean the buffer
@@ -66,6 +70,8 @@ void read_X_Y (const char *fn) {
 
 void on_exit ()
 {
+  mexPrintf("In on_exit\n");
+
   clear_buf();
   worker.~thread();
 }
