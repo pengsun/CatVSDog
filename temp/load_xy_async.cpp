@@ -128,6 +128,11 @@ void mexFunction(int no, mxArray       *vo[],
   // load_xy_async(fn_mat): load mat file and return immediately
   if (ni==1) {
     mexPrintf("In ni==1\n");
+
+    if (worker.joinable()) { // wait until last loading finishes...
+      worker.join(); 
+      mexPrintf("wait until last reading done\n");
+    }
     
     // get the file name 
     int buflen = mxGetN(vi[0])*sizeof(mxChar)+1;
