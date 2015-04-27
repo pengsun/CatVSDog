@@ -10,6 +10,7 @@ static mxArray *X = 0;
 static mxArray *Y = 0;
 
 void read_X_Y (const char *fn);
+void clear_buf();
 
 void load_mat (const char * fn) 
 {
