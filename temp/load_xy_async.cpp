@@ -1,6 +1,7 @@
 #include "mex.h"
 #include "mat.h"
 #include <thread>
+#include <mutex>
 
 using namespace std;
 
