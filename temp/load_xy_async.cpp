@@ -5,7 +5,8 @@
 using namespace std;
 
 
-static thread worker;
+static thread  worker;
+static mutex   mut;
 static mxArray *X = 0;
 static mxArray *Y = 0;
 
@@ -59,6 +60,7 @@ void clear_buf ()
 void read_X_Y (const char *fn) {
   mexPrintf("In read_X_Y\n");
   // TODO: need a lock here?
+  mut.lock();
 
   mexPrintf("open mat\n");
   MATFile *h = matOpen(fn, "r");
@@ -71,9 +73,10 @@ void read_X_Y (const char *fn) {
   matClose(h);
 
   mexPrintf("make persistence buffer X, Y\n");
-  mexMakeArrayPersistent(X);
-  mexMakeArrayPersistent(Y);
+  //mexMakeArrayPersistent(X);
+  //mexMakeArrayPersistent(Y);
 
+  mut.unlock();
   mexPrintf("Out read_X_Y\n");
 }
 
