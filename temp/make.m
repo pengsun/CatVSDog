@@ -10,8 +10,8 @@ switch str(1:3)
     opt{end+1} = 'COMPFLAGS=/openmp $COMPFLAGS';
     opt{end+1} = 'LINKFLAGS=/openmp $LINKFLAGS';
   case 'gln'
-    opt{end+1} = 'CXXFLAGS="\$CXXFLAGS -pthread -std=c++11"';
-    opt{end+1} = 'LDFLAGS="\$LDFLAGS -pthread -std=c++11"';
+    opt{end+1} = 'CXXFLAGS="\$CXXFLAGS -fopenmp -std=c++11"';
+    opt{end+1} = 'LDFLAGS="\$LDFLAGS -fopenmp -std=c++11"';
   otherwise
     error('unsupported platform');
 end
