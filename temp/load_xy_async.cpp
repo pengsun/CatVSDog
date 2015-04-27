@@ -80,11 +80,11 @@ void mexFunction(int no, mxArray       *vo[],
   if (ni==1) {
     // get the file name 
     int buflen = mxGetN(vi[0])*sizeof(mxChar)+1;
-    char *bufFN  = (char*)mxMalloc(buflen);
-    mxGetString(vi[0], bufFN, buflen); // TODO: check status
+    char *filename  = (char*)mxMalloc(buflen);
+    mxGetString(vi[0], filename, buflen); // TODO: check status
 
     // begin loading and return 
-    load_mat(buf);
+    load_mat(filename);
     mexAtExit( on_exit );
     return;
   }
