@@ -45,8 +45,12 @@ void pop_buf (mxArray* &xx, mxArray* &yy) {
 
   // pop them
   mexPrintf("deep copy\n");
+
+  mutex mm;
+  mm.lock();
   xx = mxDuplicateArray(X);
   yy = mxDuplicateArray(Y);
+  mm.unlock();
 
   mexPrintf("Out pop_buf\n");
 }
@@ -54,8 +58,12 @@ void pop_buf (mxArray* &xx, mxArray* &yy) {
 void clear_buf () 
 {
   mexPrintf("In clear_buf\n");
+  mutex mm;
+  mm.lock();
   mxDestroyArray(X);
   mxDestroyArray(Y);
+  mm.unlock();
+
   mexPrintf("Out clear_buf\n");
 }
 
