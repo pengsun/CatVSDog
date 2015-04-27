@@ -47,10 +47,13 @@ void pop_buf (mxArray* &xx, mxArray* &yy) {
 
   mutex mm;
   mm.lock();
+
   mexPrintf("copy X\n");
   xx = mxDuplicateArray(X);
+
   mexPrintf("copy Y\n");
   yy = mxDuplicateArray(Y);
+
   mm.unlock();
 
   mexPrintf("Out pop_buf\n");
@@ -63,11 +66,19 @@ void clear_buf ()
   mutex mm;
   mm.lock();
 
-  mexPrintf("clear X\n");
-  mxDestroyArray(X);
+  if (X!=0) {
+    mexPrintf("clear X\n");
+    mxDestroyArray(X);
+    X = 0;
+  }
 
-  mexPrintf("clear Y\n");
-  mxDestroyArray(Y);
+
+  if (Y!=0) {
+    mexPrintf("clear Y\n");
+    mxDestroyArray(Y);
+    Y = 0;
+  }
+
   mm.unlock();
 
   mexPrintf("Out clear_buf\n");
