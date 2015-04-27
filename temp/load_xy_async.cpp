@@ -9,8 +9,6 @@ static thread worker;
 static mxArray *X = 0;
 static mxArray *Y = 0;
 
-mxArray *mxCreateSharedDataCopy(mxArray *); // undocumented matlab
-
 void read_X_Y (const char *fn);
 
 void load_mat (const char * fn) 
@@ -34,10 +32,10 @@ void pop_buf (mxArray* &xx, mxArray* &yy) {
   if (worker.joinable()) 
     worker.join();
 
-  // pop them: do nothing but return them to Matalb who takes the control
-  mexPrintf("create shared data copy\n");
-  xx = mxCreateSharedDataCopy(X);
-  yy = mxCreateSharedDataCopy(Y);
+  // pop them
+  mexPrintf("deep copy\n");
+  xx = mxDuplicateArray(X);
+  yy = mxDuplicateArray(Y);
 }
 
 void clear_buf () 
