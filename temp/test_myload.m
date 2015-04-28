@@ -1,11 +1,11 @@
 %%
-ii = randperm(3);
+ii = randperm(2);
 iii = repmat(ii(:), 200, 1);
 
 for j = 1 : numel(iii)
   ind = iii(j);
   
-  fn = sprintf('z%d.mat', ind);
+  fn = sprintf('%d.mat', ind);
   
   myload(fn);
   
