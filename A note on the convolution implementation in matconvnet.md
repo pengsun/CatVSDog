@@ -126,6 +126,7 @@ F, dF: [500, 50]
 Y, dY: [64, 50]
 ```
 We have:
+
 `dF += phiX' * dY`. 
 The corresponding `gemm` call:
 ```
@@ -136,6 +137,18 @@ gemm('t', 'n',
      B = dY, ldB = 64,
      beta = 1 (or zero for the first instance with uninitialized dF),
      C = dF, ldC = 500)
+```
+
+`dB += u' * dY`, where `u: [1,64]` with all one elements. But to leverage `gemv`, it's convenient to compute the (equivalent) transposed version:
+`dB' += dY' * u`. The corresponding `gemv` call:
+```
+gemv('t', 
+     M = 500, N = 50,
+     alpha = 1,
+     A = dY, ldA = 64,
+     x = u,  incx = 1,
+     beta = 1 (or zero for the first instance with uninitialized dB),
+     y = dB, incy = 1)
 ```
 
 `dphiX = dY * dF'`. 
@@ -155,4 +168,4 @@ gemm('n','t',
 
 Remark:
 - When computing `dF, dB` the derivative over each instance should be accumulated; When computing `dX` the derivative over each instance should be kept as is.
-- In `gemm`, `beta = 0` means overwriting the memory so that one needs not initialize it with zeros
+- In `gemm` or `gemv`, `beta = 0` means overwriting the memory so that one needs not initialize it with zeros; `beta = 1` effectively accumulate the results
