@@ -1,32 +1,33 @@
 The conventions and rationale of the convolution in matconvnet is explained in [the mannual](http://www.vlfeat.org/matconvnet/matconvnet-manual.pdf). The im2col trick is used so that convolution is converted to matrix multiplication. 
 
 ### FPROP
-The input `X`, filter `F`, bias `B`, output `Y`:
+The input `x`, filter `f`, bias `B`, output `y`:
 ``` 
-X: [H, W, P, N]
-F: [a, b, P, Q]   B: [1, Q]
-Y: [R, S, Q, N]
+x: [H,   W,   D,  N]
+f: [H',  W',  D,  K]   B: [1, K]
+y: [H'', W'', K,  N]
 ```
 
 For each instance, convert them to matrix and multiply them as plain 2D matrix:
-
 ``` 
 for i = 1 : N
-  X [H, W, P]        (im2col)-->   XX: [RS, abP] 
-  F [a, b, P, Q]    (reshape)-->   FF: [abP, Q]
-  Y [R, S, Q]       (reshape)-->   YY: [RS, Q]
-  YY = XX * FF using gemm
+  x [H,   W,   D, 1]    (im2col)-->   phix: [H''W'', H'W'D] 
+  f [H',  W',  D, K]    (reshape)-->  F:    [H'W'D, K]
+  y [H'', W'', 1, K]    (reshape)-->  YY:   [H''W'', K]
+  YY = phix * F : [H''W'', K] = [H''W'', H'W'D]*[H'W'D, K]
   
-  B [1, Q]  (left times all one)--> BB: [RS, Q]
-  YY = YY + BB
+  create all one vector u: [H''W'', 1] to accomodate B: [1, K]
+  YY += u * B : [H''W'', K] = [H''W'',1]*[1,K]
 end
 ```
+### BPROP
+With the 
 
-### Convolution Matrix
+### im2row and row2im
 For input feature map `x` and the corresponding filter bank `f` with stride 1 and pad 0, a 'stacked' matrix `phix =: im2row(x)` is generated:
 ```
 x:    [H,   W,   D]
-f:    [H',  W',  D],
+f:    [H',  W',  D]
 y:    [H'', W'', 1]
 phix: [H''W'', H'W'D]
 ```
@@ -93,6 +94,7 @@ Remark:
 - The matrix is *column major* which is consistent with Matlab conventions
 - The stride `lda`, `ldb`, `ldc` account for sub matrix or memory that is not contiguous 
 - The stride `incx` accounts for sub (row) vector
+- In both `gemm` and `gemv`, `beta = 1` effectively accumulates the results; `beta = 0` overwrites the results (initialized with zeros)
 
 ### An example
 Suppose a mini batch with the size:
@@ -115,6 +117,41 @@ So that
 phiX: [64, 500]
 F:    [500, 50], B: [1, 50]
 Y:    [64,  50]
+```
+
+#### FPROP
+With the below size in mind:
+```
+X: [12, 12, 20]
+
+phiX: [64,  500]
+F:    [500, 50];  B: [1, 50]
+Y:    [64,  50]
+```
+We have:
+
+`Y = phiX * F + u * B`, where `u: [64, 1]` with all one elements.
+
+The `gemm` call for `phiX * F`:
+```
+gemm('n', 'n',
+     M = 64, N = 50, K = 500,
+     alpha = 1,
+     A = phiX, ldA = 64,
+     B = F,    ldB = 500,
+     beta = 0,
+     C = Y, ldC = 64)
+```
+
+The `gemm` call for `Y += u*B`:
+```
+gemm('n', 'n'
+     M = 64, N = 50, K = 1,
+     alpha = 1,
+     A = u, ldA = 64,
+     B = B, ldB = 1,
+     beta = 1,
+     C = Y, ldC = 64)
 ```
 
 #### BPROP
@@ -168,4 +205,4 @@ gemm('n','t',
 
 Remark:
 - When computing `dF, dB` the derivative over each instance should be accumulated; When computing `dX` the derivative over each instance should be kept as is.
-- In `gemm` or `gemv`, `beta = 0` means overwriting the memory so that one needs not initialize it with zeros; `beta = 1` effectively accumulate the results
+- In `gemm` or `gemv`, `beta = 0` means overwriting the memory so that one needs not initialize it with zeros; `beta = 1` effectively accumulates the results
