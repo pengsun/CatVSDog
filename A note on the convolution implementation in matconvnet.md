@@ -1,44 +1,65 @@
-The conventions and rationale of the convolution in matconvnet is explained in [the mannual](http://www.vlfeat.org/matconvnet/matconvnet-manual.pdf). The im2col trick is used so that convolution is converted to matrix multiplication. 
+The conventions and rationale of the convolution in matconvnet is explained in [the mannual](http://www.vlfeat.org/matconvnet/matconvnet-manual.pdf). The im2row trick is used so that convolution is converted to matrix multiplication. 
 
 ### FPROP
-The input `x`, filter `f`, bias `B`, output `y`:
+Given the input `x`, filter `f`, bias `B`:
 ``` 
 x: [H,   W,   D,  N]
 f: [H',  W',  D,  K]   B: [1, K]
+```
+Produce the output `y`:
+```
 y: [H'', W'', K,  N]
 ```
 
 For each instance, convert them to matrix and multiply them as plain 2D matrix:
-``` 
-for i = 1 : N
+```
   x [H,   W,   D, 1]    (im2col)-->   phix: [H''W'', H'W'D] 
   f [H',  W',  D, K]    (reshape)-->  F:    [H'W'D, K]
   y [H'', W'', 1, K]    (reshape)-->  Y:    [H''W'', K]
-  Y = phix * F : [H''W'', K] = [H''W'', H'W'D]*[H'W'D, K]
+```
+
+``` 
+for i = 1 : N
+  phix = im2row(x);   % [H''W'', H'W'D] <-- [H, W, D]
+  F    = reshape(f);  % [H'W'D, K] <-- [H', W', D, K] 
+  Y = phix * F;       % [H''W'', K] = [H''W'', H'W'D]*[H'W'D, K]
   
-  create all one vector u: [H''W'', 1] to accomodate B: [1, K]
-  Y += u * B : [H''W'', K] = [H''W'',1]*[1,K]
+  u = ones([H''W'', 1]); 
+  Y += u * B;  % [H''W'', K] = [H''W'',1]*[1,K]
 end
 ```
 
 ### BPROP
+Given:
 ```
-x, dx: [H,   W,   D,  N]
-df:    [H',  W',  D,  K]   dB: [1, K]
-dy:    [H'', W'', K,  N]
+x: [H,   W,   D,  N]
+f: [H',  W',  D,  K]
+dy: [H'', W'', K,  N]
+```
+Produce:
+```
+df: [H', W', D, K], dB: [1, K]
+dx: [H, W, D, N]
 ```
 
 ``` 
-for i = 1 : N
-  x  [H,   W,   D, 1]   (im2col)-->   phix: [H''W'', H'W'D] 
+  x  [H,   W,   D, 1]   (im2col)-->  phix: [H''W'', H'W'D] 
   df [H',  W',  D, K]  (reshape)-->  dF:   [H'W'D, K]
   dy [H'', W'', 1, K]  (reshape)-->  dY:   [H''W'', K]
-  dF += phix' * dY : [H'W'D, K] = [H'W'D, H''W'']*[H''W'', K]
-  create all one vector u [1, H''W'']
-  dB += u' * dY : [1, K] = [1, H''W'']*[H''W'', K]
+```
+
+For each instance, accumulate on `dF`, `dB` and computes `dx`
+``` 
+for i = 1 : N
+  phix = im2row(x);   % [H'W'D, H''W''] <-- [H,W,D]
+  dY   = reshape(dy); % [H''W'', K] <-- [H'', W'', K]
+  dF += phix' * dY;   % [H'W'D, K] = [H'W'D, H''W''] * [H''W'', K]
   
-  dphix = dY * F' : [H''W'', H'W'D] = [H''W'', K]*[K, H'W'D]
-  dx = col2im(dphix) : [H, W, D] <-- [H''W'', H'W'D]
+  u = ones([1, H''W'']);
+  dB += u' * dY; % [1, K] = [1, H''W''] * [H''W'', K]
+  
+  dphix = dY * F' ;   % [H''W'', H'W'D] = [H''W'', K]*[K, H'W'D]
+  dx = col2im(dphix); % [H, W, D] <-- [H''W'', H'W'D]
 end
 ```
 
@@ -69,6 +90,9 @@ row2im(x,
        filter-stride-on-H, filter-stride-on-W,
        pad-lower-on-H, pad-higher-on-H, pad-lower-on-W, pad-higher-onW)
 ```
+
+Remark:
+- The argument names are different in `*.h` and `*.cpp`, don't get confused.
 
 ### Matrix Multiplication
 See the blas doc on [gemm](http://www.math.utah.edu/software/lapack/lapack-blas/sgemm.html) and [gemv](http://www.math.utah.edu/software/lapack/lapack-blas/sgemv.html). A brief explanation:
