@@ -48,7 +48,7 @@ for i = 1 : N
   dB += u' * dY; % [1, K] = [1, H''W''] * [H''W'', K]
   
   dphix = dY * F' ;             % [H''W'', H'W'D] = [H''W'', K] * [K, H'W'D]
-  dx(:,:,:,i) = col2im(dphix);  % [H, W, D] <-- [H''W'', H'W'D]
+  dx(:,:,:,i) = row2im(dphix);  % [H, W, D] <-- [H''W'', H'W'D]
 end
 ```
 
