@@ -22,6 +22,34 @@ for i = 1 : N
 end
 ```
 
+### Convolution Matrix
+For input feature map `x` and the corresponding filter bank `f` with stride 1 and pad 0, a 'stacked' matrix `phix =: im2row(x)` is generated:
+```
+x:    [H,   W,   D]
+f:    [H',  W',  D]
+y:    [H'', W'', 1]
+phix: [H''W'', H'W'D]
+```
+where `H'' = H - H' + 1`, `W'' = W - W' + 1`, `y` is the expected filter respnose map that dosn't matter here but would be helpful as a placeholder/reminder. Specifically, the signature for `im2row`:
+```
+im2row(phix,
+       x,
+       H, W, D,
+       H', W',
+       filter-stride-on-H, filter-stride-on-W,
+       pad-lower-on-H, pad-higher-on-H, pad-lower-on-W, pad-higher-onW)
+```
+
+Likewise, the 'inverse' conversion recovers matrix `x` from the stacked matrix `phix`: `x = row2im(phix)`. The signature:
+```
+row2im(x,
+       phix,
+       H, W, D,
+       H', W',
+       filter-stride-on-H, filter-stride-on-W,
+       pad-lower-on-H, pad-higher-on-H, pad-lower-on-W, pad-higher-onW)
+```
+
 ### Matrix Multiplication
 See the blas doc on [gemm](http://www.math.utah.edu/software/lapack/lapack-blas/sgemm.html) and [gemv](http://www.math.utah.edu/software/lapack/lapack-blas/sgemv.html). A brief explanation:
 ```
