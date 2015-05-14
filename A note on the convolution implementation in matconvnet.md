@@ -1,4 +1,4 @@
-The conventions and rationale of the convolution in matconvnet is explained in [the mannual](http://www.vlfeat.org/matconvnet/matconvnet-manual.pdf). The im2row trick is used so that convolution is converted to matrix multiplication. 
+The conventions and rationale of the convolution in matconvnet is explained in [the mannual](http://www.vlfeat.org/matconvnet/matconvnet-manual.pdf). The im2row trick is used so that convolution is converted to matrix multiplication. Here is a brief explanation for the C/C++ code.
 
 ### FPROP
 Given the input `x`, filter `f`, bias `B`:
@@ -12,22 +12,17 @@ y: [H'', W'', K,  N]
 ```
 
 For each instance, convert them to matrix and multiply them as plain 2D matrix:
-```
-  x [H,   W,   D, 1]    (im2col)-->   phix: [H''W'', H'W'D] 
-  f [H',  W',  D, K]    (reshape)-->  F:    [H'W'D, K]
-  y [H'', W'', 1, K]    (reshape)-->  Y:    [H''W'', K]
-```
-
 ``` 
 for i = 1 : N
-  phix = im2row(x);   % [H''W'', H'W'D] <-- [H, W, D]
-  F    = reshape(f);  % [H'W'D, K] <-- [H', W', D, K] 
-  Y = phix * F;       % [H''W'', K] = [H''W'', H'W'D]*[H'W'D, K]
+  phix = im2row( x(:,:,:,i) );  % [H''W'', H'W'D] <-- [H, W, D]
+  F    = reshape(f);            % [H'W'D, K] <-- [H', W', D, K] 
+  Y(:,:,i) = phix * F;          % [H''W'', K] = [H''W'', H'W'D]*[H'W'D, K]
   
   u = ones([H''W'', 1]); 
-  Y += u * B;  % [H''W'', K] = [H''W'',1]*[1,K]
+  Y(:,:,i) += u * B;  % [H''W'', K] = [H''W'',1]*[1,K]
 end
 ```
+Thanks to the column-major element order in Matlab, `Y` is already the desired `y`. 
 
 ### BPROP
 Given:
@@ -42,24 +37,18 @@ df: [H', W', D, K], dB: [1, K]
 dx: [H, W, D, N]
 ```
 
-``` 
-  x  [H,   W,   D, 1]   (im2col)-->  phix: [H''W'', H'W'D] 
-  df [H',  W',  D, K]  (reshape)-->  dF:   [H'W'D, K]
-  dy [H'', W'', 1, K]  (reshape)-->  dY:   [H''W'', K]
-```
-
 For each instance, accumulate on `dF`, `dB` and computes `dx`
 ``` 
 for i = 1 : N
-  phix = im2row(x);   % [H'W'D, H''W''] <-- [H,W,D]
-  dY   = reshape(dy); % [H''W'', K] <-- [H'', W'', K]
-  dF += phix' * dY;   % [H'W'D, K] = [H'W'D, H''W''] * [H''W'', K]
+  phix = im2row( x(:,:,:,i) );    % [H'W'D, H''W''] <-- [H,W,D]
+  dY   = reshape( dy(:,:,:,i) );  % [H''W'', K] <-- [H'', W'', K]
+  dF += phix' * dY;               % [H'W'D, K] = [H'W'D, H''W''] * [H''W'', K]
   
   u = ones([1, H''W'']);
   dB += u' * dY; % [1, K] = [1, H''W''] * [H''W'', K]
   
-  dphix = dY * F' ;   % [H''W'', H'W'D] = [H''W'', K]*[K, H'W'D]
-  dx = col2im(dphix); % [H, W, D] <-- [H''W'', H'W'D]
+  dphix = dY * F' ;             % [H''W'', H'W'D] = [H''W'', K]*[K, H'W'D]
+  dx(:,:,:,i) = col2im(dphix);  % [H, W, D] <-- [H''W'', H'W'D]
 end
 ```
 
