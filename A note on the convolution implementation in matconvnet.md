@@ -37,7 +37,8 @@ for i = 1 : N
   create all one vector u [1, H''W'']
   dB += u' * dY : [1, K] = [1, H''W'']*[H''W'', K]
   
-  dphix = dY * F'
+  dphix = dY * F' : [H''W'', H'W'D] = [H''W'', K]*[K, H'W'D]
+  dx = col2im(dphix) : [H, W, D] <-- [H''W'', H'W'D]
 end
 ```
 
