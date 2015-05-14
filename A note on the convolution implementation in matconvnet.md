@@ -26,7 +26,7 @@ end
 For input feature map `x` and the corresponding filter bank `f` with stride 1 and pad 0, a 'stacked' matrix `phix =: im2row(x)` is generated:
 ```
 x:    [H,   W,   D]
-f:    [H',  W',  D]
+f:    [H',  W',  D],
 y:    [H'', W'', 1]
 phix: [H''W'', H'W'D]
 ```
@@ -98,14 +98,14 @@ Remark:
 Suppose a mini batch with the size:
 ```
 x: [12, 12, 20, 100]
-f: [5, 5, 20, 50]
+f: [5, 5, 20, 50];  B: [1, 50]
 y: [8, 8, 50, 100]
 ```
 
 For each instance:
 ```
 x: [12, 12, 20]
-f: [5,  5,  20, 50]
+f: [5,  5,  20, 50]; B: [1, 50]
 y: [8,  8,  1,  50]
 ```
 
@@ -113,7 +113,7 @@ Do convolution-matrix conversion: `phiX = im2row(x)`. Do reshaping: `F = reshape
 So that 
 ```
 phiX: [64, 500]
-F:    [500, 50]
+F:    [500, 50], B: [1, 50]
 Y:    [64,  50]
 ```
 
@@ -121,9 +121,10 @@ Y:    [64,  50]
 With the below size in mind:
 ```
 X, dX: [12, 12, 20]
-phiX, dphiX: [64, 500]
-F, dF: [500, 50]
-Y, dY: [64, 50]
+
+phiX, dphiX: [64,  500]
+F, dF:       [500, 50];  B, dB: [1, 50]
+Y, dY:       [64,  50]
 ```
 We have:
 
@@ -164,7 +165,6 @@ gemm('n','t',
 ```
 
 `dX = row2im(dphiX)`: `[12, 12, 20] <-- [64, 500]`
-
 
 Remark:
 - When computing `dF, dB` the derivative over each instance should be accumulated; When computing `dX` the derivative over each instance should be kept as is.
