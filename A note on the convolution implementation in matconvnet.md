@@ -1,4 +1,4 @@
-The conventions and rationale of the convolution in matconvnet is explained in [the mannual](http://www.vlfeat.org/matconvnet/matconvnet-manual.pdf). The im2row trick is used so that convolution is converted to matrix multiplication. Here is a brief explanation for the C/C++ code.
+The conventions and rationale of the convolution in matconvnet is explained in [the mannual](http://www.vlfeat.org/matconvnet/matconvnet-manual.pdf). The im2row trick is used so that convolution is converted to matrix multiplication. We briefly explain it using Matlab syntax and the C/C++ code in matconvnet is no more than a 'literal translation'.
 
 ### FPROP
 Given the input `x`, filter `f`, bias `B`:
