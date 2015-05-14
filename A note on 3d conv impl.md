@@ -20,7 +20,7 @@ for i = 1 : N
   Y(:,:,i) += u * B;  % [H''W''D'', Q] = [H''W''D'', 1] * [1, Q]
 end
 ```
-Thanks to the column-major element order in Matlab, `Y: [H''W''D'', Q, N]` is already the desired `y: [H'', W'', D'', Q,  N] `. 
+Thanks to the column-major element order in Matlab, the 3D matrix `Y: [H''W''D'', Q, N]` is already the desired 5D matrix `y: [H'', W'', D'', Q,  N] `. 
 
 ### BPROP
 Given:
