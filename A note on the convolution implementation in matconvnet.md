@@ -13,15 +13,33 @@ For each instance, convert them to matrix and multiply them as plain 2D matrix:
 for i = 1 : N
   x [H,   W,   D, 1]    (im2col)-->   phix: [H''W'', H'W'D] 
   f [H',  W',  D, K]    (reshape)-->  F:    [H'W'D, K]
-  y [H'', W'', 1, K]    (reshape)-->  YY:   [H''W'', K]
-  YY = phix * F : [H''W'', K] = [H''W'', H'W'D]*[H'W'D, K]
+  y [H'', W'', 1, K]    (reshape)-->  Y:    [H''W'', K]
+  Y = phix * F : [H''W'', K] = [H''W'', H'W'D]*[H'W'D, K]
   
   create all one vector u: [H''W'', 1] to accomodate B: [1, K]
-  YY += u * B : [H''W'', K] = [H''W'',1]*[1,K]
+  Y += u * B : [H''W'', K] = [H''W'',1]*[1,K]
 end
 ```
+
 ### BPROP
-With the 
+```
+x, dx: [H,   W,   D,  N]
+df:    [H',  W',  D,  K]   dB: [1, K]
+dy:    [H'', W'', K,  N]
+```
+
+``` 
+for i = 1 : N
+  x  [H,   W,   D, 1]   (im2col)-->   phix: [H''W'', H'W'D] 
+  df [H',  W',  D, K]  (reshape)-->  dF:   [H'W'D, K]
+  dy [H'', W'', 1, K]  (reshape)-->  dY:   [H''W'', K]
+  dF += phix' * dY : [H'W'D, K] = [H'W'D, H''W'']*[H''W'', K]
+  create all one vector u [1, H''W'']
+  dB += u' * dY : [1, K] = [1, H''W'']*[H''W'', K]
+  
+  dphix = dY * F'
+end
+```
 
 ### im2row and row2im
 For input feature map `x` and the corresponding filter bank `f` with stride 1 and pad 0, a 'stacked' matrix `phix =: im2row(x)` is generated:
@@ -189,14 +207,14 @@ gemv('t',
      y = dB, incy = 1)
 ```
 
-`dphiX = dY * dF'`. 
+`dphiX = dY * F'`. 
 The corresponding `gemm` call:
 ```
 gemm('n','t',
      M = 64, N = 500, K = 64,
      alpha = 1,
      A = dY, ldA = 64,
-     B = dF, ldB = 500,
+     B = F, ldB = 500,
      beta = 0,
      C = dphiX, ldC = 64)
 ```
