@@ -16,13 +16,13 @@ For each instance, convert them to matrix and multiply them as plain 2D matrix:
 for i = 1 : N
   phix = im2row( x(:,:,:,i) );  % [H''W'', H'W'D] <-- [H, W, D]
   F    = reshape(f);            % [H'W'D, K] <-- [H', W', D, K] 
-  Y(:,:,i) = phix * F;          % [H''W'', K] = [H''W'', H'W'D]*[H'W'D, K]
+  Y(:,:,i) = phix * F;          % [H''W'', K] = [H''W'', H'W'D] * [H'W'D, K]
   
   u = ones([H''W'', 1]); 
-  Y(:,:,i) += u * B;  % [H''W'', K] = [H''W'',1]*[1,K]
+  Y(:,:,i) += u * B;  % [H''W'', K] = [H''W'',1] * [1,K]
 end
 ```
-Thanks to the column-major element order in Matlab, `Y` is already the desired `y`. 
+Thanks to the column-major element order in Matlab, `Y: [H''W'', K, N]` is already the desired `y: [H'', W'', K,  N] `. 
 
 ### BPROP
 Given:
@@ -40,14 +40,14 @@ dx: [H, W, D, N]
 For each instance, accumulate on `dF`, `dB` and computes `dx`
 ``` 
 for i = 1 : N
-  phix = im2row( x(:,:,:,i) );    % [H'W'D, H''W''] <-- [H,W,D]
+  phix = im2row( x(:,:,:,i) );    % [H''W'', H'W'D] <-- [H, W, D]
   dY   = reshape( dy(:,:,:,i) );  % [H''W'', K] <-- [H'', W'', K]
   dF += phix' * dY;               % [H'W'D, K] = [H'W'D, H''W''] * [H''W'', K]
   
-  u = ones([1, H''W'']);
+  u = ones([H''W'', 1]);
   dB += u' * dY; % [1, K] = [1, H''W''] * [H''W'', K]
   
-  dphix = dY * F' ;             % [H''W'', H'W'D] = [H''W'', K]*[K, H'W'D]
+  dphix = dY * F' ;             % [H''W'', H'W'D] = [H''W'', K] * [K, H'W'D]
   dx(:,:,:,i) = col2im(dphix);  % [H, W, D] <-- [H''W'', H'W'D]
 end
 ```
