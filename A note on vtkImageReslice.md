@@ -1,4 +1,5 @@
-The vtkImageReslice is powerful but sometimes confusing due to its too many options and a mixing up of pysical coordinate and pixel coordinate when specifying the output slice. Here we give a recommended (safe) usage when getting an arbitrary 2D slice (controlled by the center and the orientation) from a 3D volume. The explanation goes with below code snippet.
+The vtkImageReslice is powerful but sometimes confusing due to its too many options and a mixing up of pysical coordinate and pixel coordinate when specifying the output slice. Here we give a recommended (safe) usage when getting an arbitrary 2D slice (controlled by the center and the orientation) from a 3D volume.
+Detailed explanation goes with below code snippet.
 
 ``` Python
 # Read the volume
@@ -38,24 +39,28 @@ reslice.SetOutputOrigin(0.0, 0.0, 0.0)
 # Reslice axes
 tf = vtk.vtkTransform()
 # The order of the translation and the rotation is important!
+# Target volume point for the plane's center is (180, 190, 200) in pixels 
 tar_cen = (x0+180*xSpacing, y0+190*ySpacing, z0+100*zSpacing)
-tf.Translate(tar_cen) # move to the target center
+tf.Translate(tar_cen)
+# Rotate the normal vector by degrees. The plane coincide with XY plane initially
 tf.RotateX(0)
 tf.RotateY(6.4) # in degree
 tf.RotateZ(10)
-reslice.SetResliceAxes(tf.GetMatrix())
 # tf.GetMatrix() returns the 4X4 transformation matrix. This line of code is equivalent to 
 # reslice.SetResliceTransform(tf), which, however, occasionally causes run time problem on
 # certain computer. Cannot figure out why...
+reslice.SetResliceAxes(tf.GetMatrix())
+
 
 # Step 3: done
-
 reslice.Update()
 ```
 
 Also, you can find the "official" example for `vtkImageReslice` at [VTK hosted on github](https://github.com/Kitware/VTK/tree/master/Examples/ImageProcessing/Python). Try to insert above code and see if it produes the desired plane.
 
 
-4/4/2015
-
 Python 2.7.6 with VTK 6.2
+
+
+7/6/2015 updated
+4/4/2015
