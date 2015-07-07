@@ -1,7 +1,8 @@
 It's based on the method given here https://xrunhprof.wordpress.com/2012/07/17/display-point-coordinates-in-paraview/
 
 Add a Programable Filter, and add below Python code
-```Python
+
+``` Python
 pdi = self.GetInput()
 pdo = self.GetOutput()
 coords = vtk.vtkDoubleArray()
