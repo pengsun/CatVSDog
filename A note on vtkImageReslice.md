@@ -56,11 +56,10 @@ reslice.SetResliceAxes(tf.GetMatrix())
 reslice.Update()
 ```
 
-Also, you can find the "official" example for `vtkImageReslice` at [VTK hosted on github](https://github.com/Kitware/VTK/tree/master/Examples/ImageProcessing/Python). Try to insert above code and see if it produes the desired plane.
+Remarks:
+* the "official" example for `vtkImageReslice` at [VTK hosted on github](https://github.com/Kitware/VTK/tree/master/Examples/ImageProcessing/Python). Try to insert above code and see if it produes the desired plane.
+* orientation as normal vector for a plane: http://www.vtk.org/Wiki/VTK/Examples/Cxx/GeometricObjects/OrientedArrow
+
+Tested for Python 2.7.6 with VTK 6.2
 
 
-Python 2.7.6 with VTK 6.2
-
-
-7/6/2015 updated
-4/4/2015
