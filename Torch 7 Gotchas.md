@@ -9,4 +9,8 @@ However, this may also lead to potential "Gotchas"
   * in the beginning at the clousure, call `model:zeroGradParameters()`. simply calling `gradParams:zero()` will NOT affect parameters of the contained models   
 
 Other pitfalls:
-* `optim.ConfusionMatrix` class: access `totalValid` or other state variables AFTER `updateValids()` method is called
+* `TemporalConvolution`
+  * the data layout is DIFFERENT: data is like `batch, width, channel` 
+* `optim.ConfusionMatrix` class
+  * access `totalValid` or other state variables AFTER `updateValids()` method is called
+  * `output` should be squeezed in case there is just one instance
