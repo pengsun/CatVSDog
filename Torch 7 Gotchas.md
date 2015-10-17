@@ -7,8 +7,8 @@ However, this may also lead to potential "Gotchas"
 * when using `DataParallelTable` for multiple gpus
   * remember to call `syncParameters()` method to collect and synchronize parameters across gpus
   * in the beginning at the clousure, call `model:zeroGradParameters()`. simply calling `gradParams:zero()` will NOT affect parameters of the contained models   
-
-Other pitfalls:
+* `nn.ClassNLLCriterion`
+  * the convention is inconsistent with `optim.ConfusionMatrix`. a safe way is to always use `FloatTensor` or `CudaTensor` for all (inputs, targets, model, criterion)
 * `TemporalConvolution`
   * the data layout is DIFFERENT: data is like `batch, width, channel` 
 * `optim.ConfusionMatrix` class
