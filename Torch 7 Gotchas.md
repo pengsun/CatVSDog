@@ -1,6 +1,7 @@
 Tensor (i.e., the multi dimensional array) plays an important role in deep Nueral Network. 
 In torch 7, the `torch.Tensor` adopts a pass-by-reference semantic, which is memory-efficient. 
 However, this may also lead to potential "Gotchas"
+* Multiplexer (duplicate input at outputs): `nn.ConcatTable` (The name is misleading?). Concatenate Table to Tensor: `nn.JoinTable`. Split Tensor to Table: `nn.SplitTable`. 
 * when using gpu
   * call `params, gradParams = net:forward()` AFTER calling `model:cuda()`, or the reference gets invalid
   * write `x = x:cuda()`, `y = y:cuda()` to convert Tensor type, `x:cuda()` is not in-place and has no effect on `x` after being called
