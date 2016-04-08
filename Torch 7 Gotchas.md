@@ -16,3 +16,7 @@ Something that may be anti-intuitive/confusing/misleading... in Torch 7.
 * `optim.ConfusionMatrix` class
   * access `totalValid` or other state variables AFTER `updateValids()` method is called
   * `output` should be squeezed in case there is just one instance
+* `optim.sgd` L2 regularization
+ * use `weightDecay`, the mnist example may be out dated. https://groups.google.com/forum/#!searchin/torch7/L2$20regularization/torch7/xpSPqkPQm9k/RTQz78DGCFYJ
+
+https://groups.google.com/forum/#!searchin/torch7/L2$20regularization/torch7/IChhfBepfZM/usUKMS7cEAAJ
