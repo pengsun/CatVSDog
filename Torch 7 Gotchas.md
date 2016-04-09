@@ -2,6 +2,7 @@ Something that may be anti-intuitive/confusing/misleading... in Torch 7.
 
 * Torch 7 tensor manipulation
   * split into sub-matrix: `split`, `chunk`
+  * broadcast: use `expand`, `expandAs` instead
 * Multiplexer (duplicate input at outputs): `nn.ConcatTable` (The name is misleading?). Concatenate Table to Tensor: `nn.JoinTable`. Split Tensor to Table: `nn.SplitTable`. 
 * when using gpu
   * call `params, gradParams = net:forward()` AFTER calling `model:cuda()`, or the reference gets invalid
